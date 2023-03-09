@@ -39,12 +39,18 @@ services:
       - redis:/data
 
   db:
-    env_file: docker/.env
-    image: postgres:14
+#    env_file: docker/.env
+#    image: postgres:14
+#    container_name: superset_db
+#    restart: unless-stopped
+#    ports:
+#      - "127.0.0.1:5432:5432"
+#    volumes:
+#      - db_home:/var/lib/postgresql/data
+    env_file: docker/.env-non-dev
+    image: postgres:10
     container_name: superset_db
     restart: unless-stopped
-    ports:
-      - "127.0.0.1:5432:5432"
     volumes:
       - db_home:/var/lib/postgresql/data
 

@@ -100,7 +100,13 @@ class CeleryConfig(object):
 
 CELERY_CONFIG = CeleryConfig
 
-FEATURE_FLAGS = {"ALERT_REPORTS": True}
+FEATURE_FLAGS = {
+        "ALERT_REPORTS": True,
+        "DASHBOARD_NATIVE_FILTERS": True,
+        "DASHBOARD_CROSS_FILTERS": True
+
+
+}
 ALERT_REPORTS_NOTIFICATION_DRY_RUN = True
 WEBDRIVER_BASEURL = "http://superset:8088/"
 # The base URL for the email report hyperlinks.
@@ -108,7 +114,67 @@ WEBDRIVER_BASEURL_USER_FRIENDLY = WEBDRIVER_BASEURL
 
 SQLLAB_CTAS_NO_LIMIT = True
 
-#
+
+
+from flask_appbuilder.security.manager import (
+    # AUTH_DB,
+    # AUTH_LDAP,
+    AUTH_OAUTH,
+    # AUTH_OID,
+    # AUTH_REMOTE_USER
+)
+import os
+
+CLIENT_ID = os.getenv('auth_0_client_id', "alsrFiaw6GkhYBelPdfi8EpeankiDkLL")
+CLIENT_ID = "7q2F5bnqcnds7xwfymRB4topKiRno26t"
+CLIENT_SECRET = os.getenv('auth_0_client_secret', "levDVnS3zVlmDzQlzWl3HDfEyr1CC5F01k6xJ2G8DlrwMQJ_CZEHGJGmrJtPncve")
+CLIENT_SECRET = "xsmipZu2uwxYmNEvlbouljQEW3mZ9PWO4rRE5XNMkQps2j2eEhmcrSUY3L1Qr3Xm"
+TENANT = os.getenv('auth_0_tenant', "logex-nl-test.eu.auth0.com")
+TENANT = "logex-uk-test.eu.auth0.com"
+api_base_url = f"https://{TENANT}"
+AUTH_TYPE = AUTH_OAUTH
+OAUTH_PROVIDERS = [
+    {   'name':'auth0',
+        'token_key':'access_token', # Name of the token in the response of access_token_url
+        'icon':'fa-address-card',   # Icon for the provider
+        'remote_app': {
+            'client_id':CLIENT_ID,  # Client Id (Identify Superset application)
+            'client_secret':CLIENT_SECRET, # Secret for this Client Id (Identify Superset application)
+            'client_kwargs':{
+                'scope': "openid email profile"              # Scope for the Authorization
+            },
+            'access_token_method':'POST',    # HTTP Method to call access_token_url
+            'access_token_params':{        # Additional parameters for calls to access_token_url
+                'client_id':CLIENT_ID
+            },
+            'access_token_headers':{    # Additional headers for calls to access_token_url
+                'Authorization': 'Basic Base64EncodedClientIdAndSecret'
+            },
+            'api_base_url':api_base_url,
+            'access_token_url':f'{api_base_url}/oauth/token',
+            'authorize_url':f"{api_base_url}/authorize",
+            'server_metadata_url': api_base_url + '/.well-known/openid-configuration',
+
+        }
+    }
+]
+
+# Will allow user self registration, allowing to create Flask users from Authorized User
+AUTH_USER_REGISTRATION = True
+
+# Map Authlib roles to superset roles
+AUTH_ROLE_ADMIN = 'Admin'
+AUTH_ROLE_PUBLIC = 'Public'
+
+# The default user self registration role
+AUTH_USER_REGISTRATION_ROLE = "Admin"
+LOG_LEVEL = "DEBUG"
+
+from custom_sso_security_manager import CustomSsoSecurityManager
+CUSTOM_SECURITY_MANAGER = CustomSsoSecurityManager
+
+
+
 # Optionally import superset_config_docker.py (which will have been included on
 # the PYTHONPATH) in order to allow for local settings to be overridden
 #
